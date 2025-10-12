@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+# Importamos la función de preprocesamiento que acabamos de crear
+from .preprocesamiento import preprocess_text
 
 # --- Mock Data ---
-# Simula una base de datos de artículos para la búsqueda.
-# Es la misma información que se usó en el archivo HTML.
+# La misma base de datos de antes.
 mock_articles = [
     { 
         "title": 'La UNAM en el ranking de las mejores universidades del mundo', 
@@ -33,23 +33,28 @@ mock_articles = [
 
 def search_articles(query, articles):
     """
-    Filtra una lista de artículos basándose en un término de búsqueda.
-    La búsqueda no distingue entre mayúsculas y minúsculas y busca en el título y el snippet.
+    Filtra artículos basándose en una búsqueda preprocesada.
+    Ahora, en lugar de buscar texto exacto, busca si alguna de las palabras clave
+    de la consulta aparece en el texto clave del artículo.
     """
-    # Convierte la consulta a minúsculas para una búsqueda insensible a mayúsculas.
-    query = query.lower().strip()
+    # Preprocesamos la consulta del usuario para obtener las palabras clave.
+    query_tokens = preprocess_text(query)
     
-    # Si la consulta está vacía, no devuelve resultados.
-    if not query:
+    if not query_tokens:
         return []
     
-    # Lista para almacenar los resultados encontrados.
     results = []
     
-    # Itera sobre cada artículo en la base de datos.
     for article in articles:
-        # Comprueba si la consulta está en el título o en el snippet del artículo.
-        if query in article['title'].lower() or query in article['snippet'].lower():
+        # Combinamos título y snippet para tener todo el texto del artículo.
+        article_text = article['title'] + " " + article['snippet']
+        
+        # Preprocesamos el texto del artículo.
+        article_tokens = preprocess_text(article_text)
+        
+        # Verificamos si CUALQUIERA de las palabras de la consulta está en las palabras del artículo.
+        # Esto es mucho más flexible que la búsqueda anterior.
+        if any(token in article_tokens for token in query_tokens):
             results.append(article)
             
     return results
@@ -58,23 +63,18 @@ def main():
     """
     Función principal que ejecuta el programa de búsqueda en la consola.
     """
-    print("--- Buscador de Gaceta UNAM (Versión de Consola en Python) ---")
+    print("--- Buscador de Gaceta UNAM (v1.1 - con Preprocesamiento) ---")
     print("Escribe tu búsqueda o 'salir' para terminar el programa.")
     
-    # Bucle infinito para permitir múltiples búsquedas.
     while True:
-        # Solicita al usuario que ingrese su búsqueda.
         user_input = input("\n> Buscar: ")
         
-        # Si el usuario escribe 'salir', el programa termina.
         if user_input.lower() == 'salir':
             print("¡Hasta luego!")
             break
         
-        # Llama a la función de búsqueda con la entrada del usuario.
         search_results = search_articles(user_input, mock_articles)
         
-        # Muestra los resultados encontrados.
         if search_results:
             print(f"\n--- Se encontraron {len(search_results)} resultados para '{user_input}' ---")
             for i, result in enumerate(search_results, 1):
@@ -82,9 +82,8 @@ def main():
                 print(f"   URL: {result['url']}")
                 print(f"   Fragmento: {result['snippet']}")
         else:
-            # Informa al usuario si no se encontraron resultados.
             print(f"\n--- No se encontraron resultados para '{user_input}' ---")
 
-# Este bloque asegura que la función main() se ejecute solo cuando el script se corre directamente.
 if __name__ == "__main__":
+    # Actualizamos el script principal para que llame a la función `main` del buscador
     main()
