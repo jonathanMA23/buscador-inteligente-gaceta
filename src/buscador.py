@@ -1,89 +1,54 @@
-# Importamos la función de preprocesamiento que acabamos de crear
-from .preprocesamiento import preprocess_text
 
-# --- Mock Data ---
-# La misma base de datos de antes.
-mock_articles = [
-    { 
-        "title": 'La UNAM en el ranking de las mejores universidades del mundo', 
-        "url": 'https://www.gaceta.unam.mx/unam-ranking-mundial-2025/', 
-        "snippet": 'La Universidad Nacional Autónoma de México se posiciona nuevamente entre las 100 mejores universidades a nivel global, destacando en áreas como artes y humanidades.' 
-    },
-    { 
-        "title": 'Descubren nueva especie de orquídea en la Reserva del Pedregal', 
-        "url": 'https://www.gaceta.unam.mx/descubren-orquidea-pedregal/', 
-        "snippet": 'Científicos del Instituto de Biología anuncian el hallazgo de una nueva especie de orquídea endémica de la Reserva Ecológica del Pedregal de San Ángel.' 
-    },
-    { 
-        "title": 'Convocatoria para becas de movilidad estudiantil 2025-2', 
-        "url": 'https://www.gaceta.unam.mx/convocatoria-becas-movilidad-2025/', 
-        "snippet": 'Se abre la convocatoria para que estudiantes de licenciatura puedan realizar una estancia académica en universidades extranjeras durante el segundo semestre de 2025.' 
-    },
-    { 
-        "title": 'El muralismo de Siqueiros: una visión revolucionaria en el MUAC', 
-        "url": 'https://www.gaceta.unam.mx/exposicion-siqueiros-muac/', 
-        "snippet": 'El Museo Universitario Arte Contemporáneo (MUAC) inaugura una magna exposición que recorre la trayectoria y el impacto del muralista David Alfaro Siqueiros.' 
-    },
-    { 
-        "title": 'Salud mental: UNAM ofrece apoyo psicológico a la comunidad', 
-        "url": 'https://www.gaceta.unam.mx/apoyo-psicologico-unam/', 
-        "snippet": 'A través de la Facultad de Psicología, la UNAM brinda atención y acompañamiento en salud mental para estudiantes, académicos y trabajadores.' 
-    }
-]
+import colorama
+# Importamos los datos de ejemplo desde su nuevo archivo
+from .data import mock_articles
+# Importamos a nuestros nuevos especialistas en indexación y ranking
+from .indexer import build_index, search_with_ranking
 
-def search_articles(query, articles):
-    """
-    Filtra artículos basándose en una búsqueda preprocesada.
-    Ahora, en lugar de buscar texto exacto, busca si alguna de las palabras clave
-    de la consulta aparece en el texto clave del artículo.
-    """
-    # Preprocesamos la consulta del usuario para obtener las palabras clave.
-    query_tokens = preprocess_text(query)
-    
-    if not query_tokens:
-        return []
-    
-    results = []
-    
-    for article in articles:
-        # Combinamos título y snippet para tener todo el texto del artículo.
-        article_text = article['title'] + " " + article['snippet']
-        
-        # Preprocesamos el texto del artículo.
-        article_tokens = preprocess_text(article_text)
-        
-        # Verificamos si CUALQUIERA de las palabras de la consulta está en las palabras del artículo.
-        # Esto es mucho más flexible que la búsqueda anterior.
-        if any(token in article_tokens for token in query_tokens):
-            results.append(article)
-            
-    return results
+# ¡Importamos a nuestro nuevo especialista en resaltado!
+from .resaltado import highlight_fragment
+
+# ¡NUEVO! Inicializamos colorama. Esto "activa" la compatibilidad de colores.
+# autoreset=True hace que cada print vuelva al estilo por defecto automáticamente.
+colorama.init(autoreset=True)
+
 
 def main():
     """
-    Función principal que ejecuta el programa de búsqueda en la consola.
+    Función principal que ejecuta el buscador.
     """
-    print("--- Buscador de Gaceta UNAM (v1.2 - con Lematizador) ---")
-    print("Escribe tu búsqueda o 'salir' para terminar el programa.")
+    print("--- Buscador de Gaceta UNAM (v2.0 - con Ranking de Relevancia) ---")
     
+    # 1. Fase de Indexación (se hace una sola vez al principio)
+    # Llama al especialista para construir el índice TF-IDF
+    vectorizer, tfidf_matrix = build_index(mock_articles)
+    
+    # 2. Bucle de Búsqueda
     while True:
-        user_input = input("\n> Buscar: ")
+        user_input = input("Escribe tu búsqueda o 'salir' para terminar el programa.\n> Buscar: ")
         
         if user_input.lower() == 'salir':
             print("¡Hasta luego!")
-            break
-        
-        search_results = search_articles(user_input, mock_articles)
-        
-        if search_results:
-            print(f"\n--- Se encontraron {len(search_results)} resultados para '{user_input}' ---")
-            for i, result in enumerate(search_results, 1):
-                print(f"\n{i}. {result['title']}")
-                print(f"   URL: {result['url']}")
-                print(f"   Fragmento: {result['snippet']}")
-        else:
-            print(f"\n--- No se encontraron resultados para '{user_input}' ---")
 
-if __name__ == "__main__":
-    # Actualizamos el script principal para que llame a la función `main` del buscador
+            break
+            
+        # Realizamos la búsqueda usando el nuevo sistema de ranking
+        search_results = search_with_ranking(user_input, vectorizer, tfidf_matrix, mock_articles)
+        
+        if not search_results:
+            print(f"\n--- No se encontraron resultados para '{user_input}' ---")
+        else:
+            print(f"\n--- Se encontraron {len(search_results)} resultados para '{user_input}' (ordenados por relevancia) ---")
+            # Iteramos sobre los resultados, que ahora incluyen un puntaje
+            for i, result in enumerate(search_results):
+                article = result['article']
+                score = result['score']
+                print(f"{i+1}. {article['title']} (Relevancia: {score:.2f})")
+                print(f"   URL: {article['url']}")
+                # Mostramos un pequeño fragmento del contenido para dar contexto
+                fragment = " ".join(article['content'].split()[:20]) + "..."
+                print(f"   Fragmento: {fragment}\n")
+
+if __name__ == '__main__':
     main()
+

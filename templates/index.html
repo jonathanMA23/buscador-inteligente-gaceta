@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador Inteligente - Gaceta UNAM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        
+        <!-- Cabecera -->
+        <header class="text-center mb-8">
+            <img src="https://www.gaceta.unam.mx/wp-content/uploads/2020/09/logo-gaceta-azul-300x63-1.png" alt="Logo Gaceta UNAM" class="mx-auto h-12 mb-4">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-900">Buscador Inteligente</h1>
+            <p class="text-gray-600 mt-2">Un nuevo motor de búsqueda para la comunidad universitaria.</p>
+        </header>
+
+        <!-- Barra de Búsqueda -->
+        <div class="mb-8">
+            <form method="POST" action="/" class="flex flex-col md:flex-row gap-2">
+                <input 
+                    type="text" 
+                    name="query" 
+                    value="{{ query }}"
+                    placeholder="Buscar en Gaceta UNAM..."
+                    class="flex-grow p-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                >
+                <button 
+                    type="submit"
+                    class="bg-blue-800 text-white font-semibold p-4 rounded-lg hover:bg-blue-900 transition duration-200 shadow-md"
+                >
+                    Buscar
+                </button>
+            </form>
+        </div>
+
+        <!-- Resultados -->
+        <main>
+            {% if query and results %}
+                <p class="text-gray-600 mb-6">Se encontraron {{ results|length }} resultados para "<strong>{{ query }}</strong>".</p>
+                <div class="space-y-6">
+                    {% for result in results %}
+                        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+                            <h2 class="text-xl font-bold text-blue-900 mb-1">
+                                <a href="{{ result.url }}" target="_blank" class="hover:underline">{{ result.title }}</a>
+                            </h2>
+                            <p class="text-sm text-green-700 font-semibold mb-3">Relevancia: {{ result.score }}</p>
+                            <p class="text-gray-700">
+                                <!-- El 'safe' le dice al navegador que renderice el HTML del resaltado -->
+                                {{ result.fragment | safe }}
+                            </p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% elif query %}
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 text-center">
+                    <p class="text-gray-700">No se encontraron resultados para "<strong>{{ query }}</strong>".</p>
+                </div>
+            {% endif %}
+        </main>
+
+    </div>
+
+</body>
+</html>
+```
+
+### **¡Lanza tu Aplicación Web!**
+
+1.  Asegúrate de haber guardado todos los archivos en sus lugares correctos.
+2.  Abre tu terminal en la **carpeta raíz** del proyecto.
+3.  Ejecuta el siguiente comando para iniciar el servidor Flask:
+    ```bash
+    python3 app.py
