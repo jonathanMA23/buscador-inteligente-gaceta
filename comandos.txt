@@ -1,0 +1,92 @@
+===================================================================
+LISTA DE COMANDOS UTILIZADOS EN EL PROYECTO
+Buscador Inteligente para Gaceta UNAM
+===================================================================
+-------------------------------------------------------------------
+FASE 1: CONFIGURACIÓN INICIAL Y GIT/GITHUB
+-------------------------------------------------------------------
+--- Creación del directorio del proyecto ---
+cd Desktop
+mkdir buscador-inteligente-gaceta
+cd buscador-inteligente-gaceta
+
+--- Inicialización del repositorio de Git ---
+git init
+
+--- Creación de la estructura de carpetas y archivos inicial ---
+mkdir src
+mkdir data
+touch README.md main.py src/buscador.py
+
+--- Ciclo básico de Git para guardar y subir cambios ---
+1. Añadir cambios al área de preparación
+git add .
+
+2. Guardar los cambios con un mensaje (commit)
+git commit -m "Un mensaje descriptivo aquí"
+
+3. Conectar el repositorio local con el de GitHub (solo se hace una vez)
+git remote add origin https://www.google.com/search?q=https://github.com/tu-usuario/tu-repositorio.git
+git branch -M main
+
+4. Subir los cambios a GitHub
+git push -u origin main
+
+-------------------------------------------------------------------
+FASE 2 Y SUBSIGUIENTES: INSTALACIÓN DE BIBLIOTECAS
+-------------------------------------------------------------------
+--- Instalación de paquetes de Python con pip ---
+pip3 install nltk
+pip3 install spacy
+pip3 install scikit-learn
+pip3 install colorama
+pip3 install Flask
+
+--- Instalar todas las dependencias de una vez usando requirements.txt ---
+pip install -r requirements.txt
+
+-------------------------------------------------------------------
+FASE 2: DESCARGA DE MODELOS DE LENGUAJE (NLTK y spaCy)
+-------------------------------------------------------------------
+--- Descarga de paquetes de NLTK (interactivo) ---
+python3
+
+Dentro del intérprete de Python:
+import nltk
+nltk.download('punkt')
+nltk.download('stopwords')
+exit()
+
+--- Descarga de paquetes de NLTK (directo desde la terminal) ---
+python3 -c "import nltk; nltk.download('punkt'); nltk.download('stopwords')"
+
+--- Descarga del modelo de español de spaCy ---
+python3 -m spacy download es_core_news_sm
+
+-------------------------------------------------------------------
+EJECUCIÓN DEL PROYECTO
+-------------------------------------------------------------------
+--- Ejecutar la versión de terminal ---
+python3 main.py
+
+--- Ejecutar la aplicación web con Flask ---
+python3 app.py
+
+-------------------------------------------------------------------
+FASE 6: USO DE DOCKER
+-------------------------------------------------------------------
+--- Construir la imagen de Docker ---
+(Asegúrate de tener Docker Desktop corriendo)
+docker build -t buscador-gaceta .
+
+--- Ejecutar el contenedor a partir de la imagen ---
+docker run -p 5000:5000 buscador-gaceta
+
+-------------------------------------------------------------------
+COMANDOS ÚTILES DE TERMINAL (macOS zsh)
+-------------------------------------------------------------------
+--- Editar el archivo de configuración de la terminal ---
+nano ~/.zshrc
+
+--- Exportar el historial de comandos a un archivo de texto ---
+history > historial_comandos.txt
