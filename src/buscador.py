@@ -63,7 +63,7 @@ def main():
     """
     Función principal que ejecuta el programa de búsqueda en la consola.
     """
-    print("--- Buscador de Gaceta UNAM (v1.1 - con Preprocesamiento) ---")
+    print("--- Buscador de Gaceta UNAM (v1.2 - con Lematizador) ---")
     print("Escribe tu búsqueda o 'salir' para terminar el programa.")
     
     while True:
