@@ -42,8 +42,7 @@ pip3 install scikit-learn
 pip3 install colorama
 pip3 install Flask
 
---- Instalar todas las dependencias de una vez usando requirements.txt ---
-pip install -r requirements.txt
+
 
 -------------------------------------------------------------------
 FASE 2: DESCARGA DE MODELOS DE LENGUAJE (NLTK y spaCy)
@@ -57,8 +56,6 @@ nltk.download('punkt')
 nltk.download('stopwords')
 exit()
 
---- Descarga de paquetes de NLTK (directo desde la terminal) ---
-python3 -c "import nltk; nltk.download('punkt'); nltk.download('stopwords')"
 
 --- Descarga del modelo de español de spaCy ---
 python3 -m spacy download es_core_news_sm
@@ -72,15 +69,6 @@ python3 main.py
 --- Ejecutar la aplicación web con Flask ---
 python3 app.py
 
--------------------------------------------------------------------
-FASE 6: USO DE DOCKER
--------------------------------------------------------------------
---- Construir la imagen de Docker ---
-(Asegúrate de tener Docker Desktop corriendo)
-docker build -t buscador-gaceta .
-
---- Ejecutar el contenedor a partir de la imagen ---
-docker run -p 5000:5000 buscador-gaceta
 
 -------------------------------------------------------------------
 COMANDOS ÚTILES DE TERMINAL (macOS zsh)
